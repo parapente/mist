@@ -2,7 +2,8 @@
 
 HubicConnection::HubicConnection()
 {
-    hubicCon = new O2(this);
+    hubicCon = new O2Hubic(this);
+    webDialog = new mistWebDialog();
 
     // Set some default values
     scope = "usage.r,account.r,getAllLinks.r,credentials.r,activate.w,links.drw";
@@ -33,8 +34,26 @@ void HubicConnection::initConnection(void)
 
 void HubicConnection::onOpenBrowser(QUrl url)
 {
-    mistWebDialog webDialog;
-    //webDialog.openUrl(QUrl("https://api.hubic.com/oauth/auth/"));
-    webDialog.openUrl(url);
-    webDialog.exec();
+    webDialog->openUrl(url);
+    webDialog->exec();
+}
+
+void HubicConnection::onCloseBrowser()
+{
+    webDialog->close();
+}
+
+void HubicConnection::onLinkingFailed()
+{
+    qDebug() << "Link has failed!";
+}
+
+void HubicConnection::onLinkedChanged()
+{
+    qDebug() << "Link has changed?";
+}
+
+void HubicConnection::onLinkingSucceeded()
+{
+    qDebug() << "Success!!";
 }

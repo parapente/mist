@@ -1,6 +1,7 @@
 #ifndef HUBICCONNECTION_H
 #define HUBICCONNECTION_H
 
+#include "mistwebdialog.h"
 #include <QUrl>
 #include <o2.h>
 #include <o2requestor.h>
@@ -24,6 +25,7 @@ class HubicConnection {
         int localPort;
         
         O2 *hubicCon;
+        mistWebDialog *webDialog;
         O2Requestor *hubicReq;
 
 };
