@@ -1,4 +1,5 @@
-#include "hubicConnection.h"
+#include "hubicconnection.h"
+#include <QDebug>
 
 HubicConnection::HubicConnection()
 {
@@ -20,6 +21,8 @@ HubicConnection::HubicConnection()
 
 HubicConnection::~HubicConnection()
 {
+    if (hubicCon->linked())
+        hubicCon->unlink();
     delete hubicCon;
 }
 
@@ -38,22 +41,22 @@ void HubicConnection::onOpenBrowser(QUrl url)
     webDialog->exec();
 }
 
-void HubicConnection::onCloseBrowser()
+void HubicConnection::onCloseBrowser(void)
 {
     webDialog->close();
 }
 
-void HubicConnection::onLinkingFailed()
+void HubicConnection::onLinkingFailed(void)
 {
     qDebug() << "Link has failed!";
 }
 
-void HubicConnection::onLinkedChanged()
+void HubicConnection::onLinkedChanged(void)
 {
     qDebug() << "Link has changed?";
 }
 
-void HubicConnection::onLinkingSucceeded()
+void HubicConnection::onLinkingSucceeded(void)
 {
     qDebug() << "Success!!";
 }

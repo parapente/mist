@@ -5,8 +5,9 @@
 #include <QUrl>
 #include <o2.h>
 #include <o2requestor.h>
+#include <o2hubic.h>
 
-class HubicConnection {
+class HubicConnection : public QObject {
     Q_OBJECT
     
     public:
@@ -16,6 +17,10 @@ class HubicConnection {
     public slots:
         void initConnection(void);
         void onOpenBrowser(QUrl url);
+        void onCloseBrowser(void);
+        void onLinkingFailed(void);
+        void onLinkedChanged(void);
+        void onLinkingSucceeded(void);
         
     private:
         QString clientId;
@@ -24,7 +29,7 @@ class HubicConnection {
         QString requestUrl;
         int localPort;
         
-        O2 *hubicCon;
+        O2Hubic *hubicCon;
         mistWebDialog *webDialog;
         O2Requestor *hubicReq;
 

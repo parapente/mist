@@ -13,8 +13,8 @@ main.cpp
 mainwindow.cpp
 mainwindow.h
 mistremotefsmodel.cpp
-mistremotefsmodel.h
-mainwindow.ui)
+mainwindow.ui
+hubicconnection.cpp)
 
 QT4_WRAP_UI(mainwin_UI_SRCS mainwindow.ui)
 
