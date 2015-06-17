@@ -1,5 +1,6 @@
 #include "hubicconnection.h"
 #include <QDebug>
+#include <QSettings>
 
 HubicConnection::HubicConnection()
 {
@@ -28,8 +29,18 @@ HubicConnection::~HubicConnection()
 
 void HubicConnection::initConnection(void)
 {
-    hubicCon->setClientId("api_hubic_NhdELNrW2JTB4cUewEoeKuDJBrA4uGeI"); // Fix: ClientID and ClientSecret should be read from configuration file
-    hubicCon->setClientSecret("Fk0qQUfla9COjLumln0tIDQ6l5NaheGhX5RJiLBCIwKxMxaHyxWyQEXHeJx91G7N");
+    QSettings settings;
+
+    clientId = settings.value("hubic/clientid").toString();
+    clientSecret = settings.value("hubic/clientsecret").toString();
+    if (clientId.isNull() || clientSecret.isNull()) { // Fix: Show id/secret dialog
+        qDebug() << "No id/secret";
+    }
+    else {
+        qDebug() << "Id/secret OK";
+        hubicCon->setClientId(clientId);
+        hubicCon->setClientSecret(clientSecret);
+    }
     hubicCon->setScope(scope);
     hubicCon->setRequestUrl(requestUrl);
     hubicCon->setLocalPort(50050); // Fix: local port should be configurable
