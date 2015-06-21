@@ -1,9 +1,14 @@
 #include "mistremotefsmodel.h"
 #include "mistremotefsitem.h"
 
-mistRemoteFSModel::mistRemoteFSModel(QObject *parent) :
+mistRemoteFSModel::mistRemoteFSModel(const QStringList &headers, QObject *parent) :
     QAbstractItemModel(parent)
 {
+    QVector<QVariant> rootData;
+    foreach (QString header, headers)
+        rootData << header;
+
+    rootItem = new mistRemoteFSItem(rootData);
 }
 
 mistRemoteFSModel::~mistRemoteFSModel()
@@ -26,7 +31,7 @@ bool mistRemoteFSModel::setData ( const QModelIndex& index, const QVariant& valu
         return false;
 
     mistRemoteFSItem *item = getItem(index);
-    bool result = item->setData(index.column(), value);
+    bool result = item->setData(index.column(), value, role);
 
     if (result)
         emit dataChanged(index, index);
@@ -39,12 +44,12 @@ QVariant mistRemoteFSModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole)
+    if (role != Qt::DisplayRole && role != Qt::DecorationRole)
         return QVariant();
 
     mistRemoteFSItem *item = static_cast<mistRemoteFSItem*>(index.internalPointer());
 
-    return item->data(index.column());
+    return item->data(index.column(), role);
 }
 
 Qt::ItemFlags mistRemoteFSModel::flags(const QModelIndex &index) const
@@ -59,7 +64,7 @@ QVariant mistRemoteFSModel::headerData ( int section, Qt::Orientation orientatio
         int role ) const
 {
     if ( orientation == Qt::Horizontal && role == Qt::DisplayRole )
-        return rootItem->data ( section );
+        return rootItem->data ( section, role );
 
     return QVariant();
 }
@@ -127,7 +132,7 @@ bool mistRemoteFSModel::setHeaderData ( int section, Qt::Orientation orientation
     if (role != Qt::EditRole || orientation != Qt::Horizontal)
         return false;
 
-    bool result = rootItem->setData(section, value);
+    bool result = rootItem->setData(section, value, role);
 
     if (result)
         emit headerDataChanged(orientation, section, section);

@@ -51,15 +51,24 @@ int mistRemoteFSItem::columnCount() const
     return itemData.count();
 }
 
-QVariant mistRemoteFSItem::data(int column) const
+QVariant mistRemoteFSItem::data(int column, int role) const
 {
+    if (role == Qt::DecorationRole) {
+        return itemIcon;
+    }
+
     return itemData.value(column);
 }
 
-bool mistRemoteFSItem::setData ( int column, QVariant data )
+bool mistRemoteFSItem::setData ( int column, QVariant data, int role )
 {
     if (column<0 || column>=itemData.size())
         return false;
+
+    if (role == Qt::DecorationRole) {
+        itemIcon = data.value<QIcon>();
+        return true;
+    }
 
     itemData[column] = data;
     return true;

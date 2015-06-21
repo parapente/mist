@@ -2,6 +2,7 @@
 #define MISTREMOTEFSMODEL_H
 
 #include <QAbstractItemModel>
+#include <QStringList>
 
 class mistRemoteFSItem;
 
@@ -9,7 +10,7 @@ class mistRemoteFSModel : public QAbstractItemModel
 {
     Q_OBJECT
 public:
-    explicit mistRemoteFSModel(QObject *parent = 0);
+    explicit mistRemoteFSModel(const QStringList &headers, QObject *parent = 0);
     virtual ~mistRemoteFSModel();
 
     // Item data handling

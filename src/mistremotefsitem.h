@@ -23,6 +23,8 @@
 #include <QList>
 #include <QVector>
 #include <QVariant>
+#include <QIcon>
+#include <QDebug>
 
 class mistRemoteFSItem
 {
@@ -35,8 +37,8 @@ public:
     mistRemoteFSItem *child(int row);
     int childCount() const;
     int columnCount() const;
-    QVariant data(int column) const;
-    bool setData(int column, QVariant data);
+    QVariant data(int column, int role) const;
+    bool setData(int column, QVariant data, int role);
     int row() const;
     mistRemoteFSItem *parent();
     bool insertChildren(int position, int count, int columns);
@@ -45,6 +47,7 @@ public:
 private:
     QList<mistRemoteFSItem*> childItems;
     QVector<QVariant> itemData;
+    QIcon itemIcon;
     mistRemoteFSItem *parentItem;
 };
 
