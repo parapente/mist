@@ -1,30 +1,25 @@
 #include "hubicconnection.h"
 #include <QDebug>
 #include <QSettings>
+#include "o2globals.h"
 
 HubicConnection::HubicConnection()
 {
-    hubicCon = new O2Hubic(this);
     webDialog = new mistWebDialog();
 
-    // Set some default values
-    scope = "usage.r,account.r,getAllLinks.r,credentials.r,activate.w,links.drw";
-    requestUrl = "https://api.hubic.com/oauth/auth";
-    
     // Connections to O2
-    connect(hubicCon, SIGNAL(linkedChanged()), this, SLOT(onLinkedChanged()));
-    connect(hubicCon, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
-    connect(hubicCon, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
-    connect(hubicCon, SIGNAL(openBrowser(QUrl)), this, SLOT(onOpenBrowser(QUrl)));
-    connect(hubicCon, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
+    connect(this, SIGNAL(linkedChanged()), this, SLOT(onLinkedChanged()));
+    connect(this, SIGNAL(linkingFailed()), this, SLOT(onLinkingFailed()));
+    connect(this, SIGNAL(linkingSucceeded()), this, SLOT(onLinkingSucceeded()));
+    connect(this, SIGNAL(openBrowser(QUrl)), this, SLOT(onOpenBrowser(QUrl)));
+    connect(this, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
 
 }
 
 HubicConnection::~HubicConnection()
 {
-    if (hubicCon->linked())
-        hubicCon->unlink();
-    delete hubicCon;
+    if (linked())
+        unlink();
 }
 
 void HubicConnection::initConnection(void)
@@ -33,17 +28,18 @@ void HubicConnection::initConnection(void)
 
     clientId = settings.value("hubic/clientid").toString();
     clientSecret = settings.value("hubic/clientsecret").toString();
+    localPort = settings.value("hubic/localport").toInt();
+
     if (clientId.isNull() || clientSecret.isNull()) { // Fix: Show id/secret dialog
         qDebug() << "No id/secret";
     }
     else {
         qDebug() << "Id/secret OK";
-        hubicCon->setClientId(clientId);
-        hubicCon->setClientSecret(clientSecret);
+        setClientId(clientId);
+        setClientSecret(clientSecret);
     }
-    hubicCon->setScope(scope);
-    hubicCon->setRequestUrl(requestUrl);
-    hubicCon->setLocalPort(50050); // Fix: local port should be configurable
+    setLocalPort(localPort);
+    link();
 }
 
 void HubicConnection::onOpenBrowser(QUrl url)
@@ -70,4 +66,27 @@ void HubicConnection::onLinkedChanged(void)
 void HubicConnection::onLinkingSucceeded(void)
 {
     qDebug() << "Success!!";
+    emit linkSucceeded();
+
+    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
+    O2Requestor *requestor = new O2Requestor(manager, this);
+
+    QUrl url = QUrl("https://api.hubic.com/1.0/account");
+
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
+
+    connect(requestor, SIGNAL(finished(int,QNetworkReply::NetworkError,QByteArray)), this, SLOT(readAccountData(int,QNetworkReply::NetworkError,QByteArray)));
+    requestor->get(request);
+}
+
+void HubicConnection::readAccountData(int id, QNetworkReply::NetworkError error, QByteArray data)
+{
+    if (error == QNetworkReply::NoError) {
+        qDebug() << data;
+    }
+    else {
+        qDebug() << "Error! Errno: " << error;
+    }
 }

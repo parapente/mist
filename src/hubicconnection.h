@@ -7,13 +7,16 @@
 #include <o2requestor.h>
 #include <o2hubic.h>
 
-class HubicConnection : public QObject {
+class HubicConnection : public O2Hubic {
     Q_OBJECT
     
     public:
         HubicConnection();
         ~HubicConnection();
-        
+
+    signals:
+        void linkSucceeded(void);
+
     public slots:
         void initConnection(void);
         void onOpenBrowser(QUrl url);
@@ -25,14 +28,13 @@ class HubicConnection : public QObject {
     private:
         QString clientId;
         QString clientSecret;
-        QString scope;
-        QString requestUrl;
         int localPort;
-        
-        O2Hubic *hubicCon;
-        mistWebDialog *webDialog;
-        O2Requestor *hubicReq;
 
+        mistWebDialog *webDialog;
+        QNetworkReply *reply;
+
+private slots:
+    void readAccountData(int id, QNetworkReply::NetworkError error, QByteArray data);
 };
 
 #endif // HUBICCONNECTION_H

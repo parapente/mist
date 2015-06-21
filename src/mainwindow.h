@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "hubicconnection.h"
+#include "mistremotefsmodel.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,6 +20,10 @@ public:
 private:
     Ui::MainWindow *ui;
     HubicConnection *hubicCon;
+    mistRemoteFSModel *model;
+
+public slots:
+    void hubicLinkToggle(void);
 
 };
 

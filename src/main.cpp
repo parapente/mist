@@ -1,7 +1,6 @@
 #include <QApplication>
-#include <QSettings>
+#include <QDebug>
 #include "mainwindow.h"
-#include <iostream>
 
 using namespace std;
 
@@ -11,11 +10,7 @@ int main(int argc, char *argv[])
     app.setOrganizationName("Over the clouds");
     app.setApplicationName("Mist");
 
-    QSettings settings;
-
-    settings.setValue("testSetting", "OK");
-
-    cout << "Hello World!" << endl;
+    qDebug() << "Hello World!";
 
     MainWindow mainWin;
 
