@@ -13,9 +13,7 @@ else(NOT SUFFIX_VERSION)
 set(VERSION_STRING_FULL "${VERSION_STRING}-${SUFFIX_VERSION}")
 endif(NOT SUFFIX_VERSION)
 
-find_package(Qt4 REQUIRED)
-
-include_directories(${QT_INCLUDE_DIR} ${QT_QTCORE_INCLUDE_DIR})
+find_package(Qt5 COMPONENTS Core Gui Widgets Network WebKitWidgets REQUIRED)
 
 add_subdirectory(src)
 
