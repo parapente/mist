@@ -50,7 +50,7 @@ void mistWebDialog::finished(QNetworkReply* reply)
 
 void mistWebDialog::openUrl(QUrl url)
 {
-    qDebug() << QString("Opening browser at: ") << url.toString();
+    //qDebug() << QString("Opening browser at: ") << url.toString();
     webView->load(url);
 }
 
@@ -60,7 +60,7 @@ void mistWebDialog::sslErrorHandler(QNetworkReply* qnr, const QList< QSslError >
     // show list of all ssl errors
     foreach (QSslError err, errlist)
         qDebug() << "ssl error: " << err;
-    
+
     qnr->ignoreSslErrors();
 }
 
