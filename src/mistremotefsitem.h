@@ -24,6 +24,7 @@
 #include <QVector>
 #include <QVariant>
 #include <QIcon>
+#include <QBrush>
 #include <QDebug>
 
 class mistRemoteFSItem
@@ -48,6 +49,7 @@ private:
     QList<mistRemoteFSItem*> childItems;
     QVector<QVariant> itemData;
     QIcon itemIcon;
+    QBrush itemBrush;
     mistRemoteFSItem *parentItem;
 };
 

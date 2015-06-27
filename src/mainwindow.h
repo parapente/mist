@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QAction>
 #include "hubicconnection.h"
 #include "mistremotefsmodel.h"
 
@@ -25,6 +26,8 @@ private:
 public slots:
     void hubicLinkToggle(void);
 
+private slots:
+    void treeViewContextMenu(const QPoint& pos);
 };
 
 #endif // MAINWINDOW_H

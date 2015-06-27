@@ -32,7 +32,7 @@
      <x>0</x>
      <y>0</y>
      <width>633</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -64,7 +64,26 @@
   </action>
   <action name="actionHubiC">
    <property name="text">
-    <string>HubiC</string>
+    <string>hubiC</string>
+   </property>
+   <property name="toolTip">
+    <string>hubiC</string>
+   </property>
+  </action>
+  <action name="actionConnectHubic">
+   <property name="text">
+    <string>Connect to hubiC</string>
+   </property>
+   <property name="toolTip">
+    <string>Connect to hubiC</string>
+   </property>
+  </action>
+  <action name="actionDisconnectHubic">
+   <property name="text">
+    <string>Disconnect</string>
+   </property>
+   <property name="toolTip">
+    <string>Disconnect</string>
    </property>
   </action>
  </widget>

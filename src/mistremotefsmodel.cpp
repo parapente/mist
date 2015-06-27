@@ -44,7 +44,7 @@ QVariant mistRemoteFSModel::data(const QModelIndex &index, int role) const
     if (!index.isValid())
         return QVariant();
 
-    if (role != Qt::DisplayRole && role != Qt::DecorationRole)
+    if (role != Qt::DisplayRole && role != Qt::DecorationRole && role != Qt::ForegroundRole)
         return QVariant();
 
     mistRemoteFSItem *item = static_cast<mistRemoteFSItem*>(index.internalPointer());

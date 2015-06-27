@@ -57,6 +57,10 @@ QVariant mistRemoteFSItem::data(int column, int role) const
         return itemIcon;
     }
 
+    if (role == Qt::ForegroundRole) {
+        return itemBrush;
+    }
+
     return itemData.value(column);
 }
 
@@ -66,8 +70,21 @@ bool mistRemoteFSItem::setData ( int column, QVariant data, int role )
         return false;
 
     if (role == Qt::DecorationRole) {
-        itemIcon = data.value<QIcon>();
-        return true;
+        if (data.canConvert<QIcon>()) {
+            itemIcon = data.value<QIcon>();
+            return true;
+        }
+        else
+            return false;
+    }
+
+    if (role == Qt::ForegroundRole) {
+        if (data.canConvert<QBrush>()) {
+            itemBrush = data.value<QBrush>();
+            return true;
+        }
+        else
+            return false;
     }
 
     itemData[column] = data;
