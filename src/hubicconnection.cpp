@@ -5,6 +5,7 @@
 
 HubicConnection::HubicConnection()
 {
+    base_url = "https://api.hubic.com/1.0";
     webDialog = new mistWebDialog();
 
     // Connections to O2
@@ -14,6 +15,9 @@ HubicConnection::HubicConnection()
     connect(this, SIGNAL(openBrowser(QUrl)), this, SLOT(onOpenBrowser(QUrl)));
     connect(this, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
 
+    manager = new QNetworkAccessManager(this);
+    requestor = new O2Requestor(manager, this);
+    connect(requestor, SIGNAL(finished(int,QNetworkReply::NetworkError,QByteArray)), this, SLOT(readData(int,QNetworkReply::NetworkError,QByteArray)));
 }
 
 HubicConnection::~HubicConnection()
@@ -68,20 +72,27 @@ void HubicConnection::onLinkingSucceeded(void)
     qDebug() << "Success!!";
     emit linkSucceeded();
 
-    QNetworkAccessManager *manager = new QNetworkAccessManager(this);
-    O2Requestor *requestor = new O2Requestor(manager, this);
-
-    QUrl url = QUrl("https://api.hubic.com/1.0/account");
+    // On success get account info
+    QUrl url = QUrl(base_url + "/account");
 
     QNetworkRequest request(url);
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
 
-    connect(requestor, SIGNAL(finished(int,QNetworkReply::NetworkError,QByteArray)), this, SLOT(readAccountData(int,QNetworkReply::NetworkError,QByteArray)));
-    requestor->get(request);
+    int id = requestor->get(request);
+    reqhash[id] = O2_HUBIC_ACCOUNT;
+    
+    //Get OpenStack credentials
+    url = QUrl(base_url + "/acount/credentials");
+    QNetworkRequest cred_request(url);
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
+
+    id = requestor->get(cred_request);
+    reqhash[id] = O2_HUBIC_ACCOUNT_CREDENTIALS;
 }
 
-void HubicConnection::readAccountData(int id, QNetworkReply::NetworkError error, QByteArray data)
+void HubicConnection::readData(int id, QNetworkReply::NetworkError error, QByteArray data)
 {
     if (error == QNetworkReply::NoError) {
         qDebug() << data;
