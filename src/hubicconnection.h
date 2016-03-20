@@ -4,6 +4,7 @@
 #include "mistwebdialog.h"
 #include <QUrl>
 #include <QMap>
+#include <QNetworkReply>
 #include <o2.h>
 #include <o2requestor.h>
 #include <o2hubic.h>
@@ -40,7 +41,7 @@ class HubicConnection : public O2Hubic {
         O2Requestor *requestor;
 
 private slots:
-    void readData(int id, QNetworkReply::NetworkError error, QByteArray data);
+    void readData(QNetworkReply *reply);
 };
 
 #endif // HUBICCONNECTION_H

@@ -9,7 +9,9 @@ mainwindow.cpp
 mainwindow.h
 mistremotefsmodel.cpp
 mainwindow.ui
-hubicconnection.cpp)
+hubicconnection.cpp
+reqqueue.cpp
+reqqueueitem.cpp)
 
 QT5_WRAP_UI(mainwin_UI_SRCS mainwindow.ui)
 

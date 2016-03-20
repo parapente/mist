@@ -1,6 +1,7 @@
 #include "hubicconnection.h"
 #include <QDebug>
 #include <QSettings>
+#include <QUrlQuery>
 #include "o2globals.h"
 
 HubicConnection::HubicConnection()
@@ -16,8 +17,7 @@ HubicConnection::HubicConnection()
     connect(this, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
 
     manager = new QNetworkAccessManager(this);
-    requestor = new O2Requestor(manager, this);
-    connect(requestor, SIGNAL(finished(int,QNetworkReply::NetworkError,QByteArray)), this, SLOT(readData(int,QNetworkReply::NetworkError,QByteArray)));
+    connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(readData(QNetworkReply*)));
 }
 
 HubicConnection::~HubicConnection()
@@ -72,32 +72,33 @@ void HubicConnection::onLinkingSucceeded(void)
     qDebug() << "Success!!";
     emit linkSucceeded();
 
-    // On success get account info
-    QUrl url = QUrl(base_url + "/account");
+    if (linked()) {
+        // On success get account info
+        QUrl url(base_url + "/account");
+        //query.addQueryItem("access_token", this->token().toUtf8());
+        QNetworkRequest request(url);
+        request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+        request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
 
-    QNetworkRequest request(url);
-    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
-    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
+        manager->get(request);
+        
+        //Get OpenStack credentials
+        url = QUrl(base_url + "/account/credentials");
+        QNetworkRequest cred_request(url);
+        cred_request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+        cred_request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
 
-    int id = requestor->get(request);
-    reqhash[id] = O2_HUBIC_ACCOUNT;
-    
-    //Get OpenStack credentials
-    url = QUrl(base_url + "/acount/credentials");
-    QNetworkRequest cred_request(url);
-    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
-    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
-
-    id = requestor->get(cred_request);
-    reqhash[id] = O2_HUBIC_ACCOUNT_CREDENTIALS;
+        manager->get(cred_request);
+    }
 }
 
-void HubicConnection::readData(int id, QNetworkReply::NetworkError error, QByteArray data)
+void HubicConnection::readData(QNetworkReply *reply)
 {
-    if (error == QNetworkReply::NoError) {
-        qDebug() << data;
+    if (reply->error() == QNetworkReply::NoError) {
+        qDebug() << reply->readAll();
     }
     else {
-        qDebug() << "Error! Errno: " << error;
+        qDebug() << "Error! Errno: " << reply->error();
+        qDebug() << reply->errorString();
     }
 }
