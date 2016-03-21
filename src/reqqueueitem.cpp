@@ -4,12 +4,14 @@ ReqQueueItem::ReqQueueItem()
 {
     _bytearray = NULL;
     _multipart = NULL;
+    _reply = NULL;
 }
 
 ReqQueueItem::ReqQueueItem(int id, QString command, QNetworkRequest request) : _id(id), _command(command), _request(request)
 {
     _bytearray = NULL;
     _multipart = NULL;
+    _reply = NULL;
 }
 
 ReqQueueItem::ReqQueueItem(int id, QString command, QNetworkReply* reply) : _id(id), _command(command), _reply(reply)
@@ -25,6 +27,7 @@ ReqQueueItem::ReqQueueItem(const ReqQueueItem &other)
     _request = other.request();
     _bytearray = other.byteArray();
     _multipart = other.multipart();
+    _reply = other.reply();
 }
 
 ReqQueueItem& ReqQueueItem::operator =(const ReqQueueItem& other)
@@ -34,6 +37,7 @@ ReqQueueItem& ReqQueueItem::operator =(const ReqQueueItem& other)
     _request = other.request();
     _bytearray = other.byteArray();
     _multipart = other.multipart();
+    _reply = other.reply();
 }
 
 ReqQueueItem::~ReqQueueItem()
