@@ -1,13 +1,14 @@
 #ifndef HUBICCONNECTION_H
 #define HUBICCONNECTION_H
 
-#include "mistwebdialog.h"
 #include <QUrl>
 #include <QMap>
 #include <QNetworkReply>
 #include <o2.h>
 #include <o2requestor.h>
 #include <o2hubic.h>
+#include "mistwebdialog.h"
+#include "reqqueue.h"
 
 class HubicConnection : public O2Hubic {
     Q_OBJECT
@@ -39,6 +40,7 @@ class HubicConnection : public O2Hubic {
         QNetworkReply *reply;
         QNetworkAccessManager *manager;
         O2Requestor *requestor;
+        ReqQueue *queue;
 
 private slots:
     void readData(QNetworkReply *reply);

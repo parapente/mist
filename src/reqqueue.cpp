@@ -2,8 +2,9 @@
 
 ReqQueue::ReqQueue(QNetworkAccessManager *nam)
 {
-    this->_nam = nam;
-    this->_id = 1;
+    _nam = nam;
+    _id = 1;
+    _numconnections = 1;
     connect(_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(onFinishedRequest(QNetworkReply*)));
 }
 
@@ -12,8 +13,11 @@ void ReqQueue::push(QString command, QNetworkRequest newreq)
     ReqQueueItem item;
     item.setCommand(command);
     item.setRequest(newreq);
-    item.setId(this->_id++);
+    item.setId(_id++);
     _reqlist.append(item);
+
+    if (_numconnections)
+        startNextReq();
 }
 
 ReqQueueItem ReqQueue::pop()
@@ -24,17 +28,46 @@ ReqQueueItem ReqQueue::pop()
 void ReqQueue::onFinishedRequest(QNetworkReply *req)
 {
     // Remove this request from the list
-    for (int i=0; i<_reqlist.count(); i++) {
-        if (_reqlist.at(i).request() == req->request())
-            _reqlist.removeAt(i);
+    QMutableListIterator<ReqQueueItem> i(_reqlist);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value().request().url() == req->request().url()) {
+            i.remove();
+            //qDebug() << "Removed item " << i;
+            qDebug() << "Equal!";
+        }
+        else {
+            qDebug() << "Not equal!";
+            qDebug() << i.value().request().url();
+            qDebug() << req->request().url();
+        }
     }
+    _numconnections++;
+    qDebug() << "Num connections: " << _numconnections;
 
+    if (_reqlist.size() != 0)
+        startNextReq();
+}
+
+void ReqQueue::startNextReq(void)
+{
     // Start the next request
     ReqQueueItem nextItem = _reqlist.first();
     if (nextItem.command() == "get") {
-        _nam->get(nextItem.request());
+        nextItem.setReply(_nam->get(nextItem.request()));
     }
     else if (nextItem.command() == "post") {
-
+        if (nextItem.multipart()) {
+            _nam->post(nextItem.request(), nextItem.multipart());
+        }
+        else {
+            _nam->post(nextItem.request(), *(nextItem.byteArray()));
+        }
     }
+    else {
+        qDebug() << "Command " << nextItem.command() << " not supported!!!";
+    }
+
+    _numconnections--;
+    qDebug() << "Num connections: " << _numconnections;
 }

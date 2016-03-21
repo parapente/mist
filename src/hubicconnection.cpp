@@ -17,6 +17,7 @@ HubicConnection::HubicConnection()
     connect(this, SIGNAL(closeBrowser()), this, SLOT(onCloseBrowser()));
 
     manager = new QNetworkAccessManager(this);
+    queue = new ReqQueue(manager);
     connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(readData(QNetworkReply*)));
 }
 
@@ -80,7 +81,8 @@ void HubicConnection::onLinkingSucceeded(void)
         request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
         request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
 
-        manager->get(request);
+        queue->push("get", request);
+        //manager->get(request);
         
         //Get OpenStack credentials
         url = QUrl(base_url + "/account/credentials");
@@ -88,7 +90,8 @@ void HubicConnection::onLinkingSucceeded(void)
         cred_request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
         cred_request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
 
-        manager->get(cred_request);
+        queue->push("get", cred_request);
+        //manager->get(cred_request);
     }
 }
 

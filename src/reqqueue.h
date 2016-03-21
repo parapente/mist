@@ -1,3 +1,6 @@
+#ifndef REQQUEUE_H
+#define REQQUEUE_H
+
 #include <QList>
 #include <QNetworkRequest>
 #include <QNetworkReply>
@@ -18,6 +21,12 @@ class ReqQueue: QObject{
 
     private:
         int _id;
+        int _numconnections;
         QNetworkAccessManager *_nam;
         QList<ReqQueueItem> _reqlist;
+
+    private:
+        void startNextReq(void);
 };
+
+#endif // REQQUEUE_H
