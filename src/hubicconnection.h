@@ -4,6 +4,7 @@
 #include <QUrl>
 #include <QMap>
 #include <QNetworkReply>
+#include <QHttpMultiPart>
 #include <o2.h>
 #include <o2requestor.h>
 #include <o2hubic.h>
@@ -41,6 +42,10 @@ class HubicConnection : public O2Hubic {
         QNetworkAccessManager *manager;
         O2Requestor *requestor;
         ReqQueue *queue;
+
+    private:
+        QNetworkRequest nrprep(QUrl, QString);
+
 
 private slots:
     void readData(QNetworkReply *reply);

@@ -75,23 +75,13 @@ void HubicConnection::onLinkingSucceeded(void)
 
     if (linked()) {
         // On success get account info
-        QUrl url(base_url + "/account");
-        //query.addQueryItem("access_token", this->token().toUtf8());
-        QNetworkRequest request(url);
-        request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
-        request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
-
-        queue->push("get", request);
-        //manager->get(request);
+        queue->push("get", nrprep(base_url + "/account", token()));
         
-        //Get OpenStack credentials
-        url = QUrl(base_url + "/account/credentials");
-        QNetworkRequest cred_request(url);
-        cred_request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
-        cred_request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token().toUtf8());
+        // Get OpenStack credentials
+        queue->push("get", nrprep(base_url + "/account/credentials", token()));
 
-        queue->push("get", cred_request);
-        //manager->get(cred_request);
+        // Get Usage
+        queue->push("get", nrprep(base_url + "/account/usage", token()));
     }
 }
 
@@ -104,4 +94,12 @@ void HubicConnection::readData(QNetworkReply *reply)
         qDebug() << "Error! Errno: " << reply->error();
         qDebug() << reply->errorString();
     }
+}
+
+QNetworkRequest HubicConnection::nrprep(QUrl url, QString token)
+{
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token.toUtf8());
+    return request;
 }
