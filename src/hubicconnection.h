@@ -43,8 +43,14 @@ class HubicConnection : public O2Hubic {
         O2Requestor *requestor;
         ReqQueue *queue;
 
+        quint64 usedSpace;
+        quint64 availableSpace;
+        QString osEndpoint, osToken, osTokenExpiresOn;
+        QString email, firstName, lastName, activated, creationDate, language, status, offer;
+
     private:
         QNetworkRequest nrprep(QUrl, QString);
+        QNetworkRequest xnrprep(QUrl, QString);
 
 
 private slots:

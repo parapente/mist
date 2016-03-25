@@ -1,7 +1,10 @@
-#include "hubicconnection.h"
 #include <QDebug>
 #include <QSettings>
 #include <QUrlQuery>
+#include <QJsonDocument>
+#include <QJsonObject>
+
+#include "hubicconnection.h"
 #include "o2globals.h"
 
 HubicConnection::HubicConnection()
@@ -88,12 +91,63 @@ void HubicConnection::onLinkingSucceeded(void)
 void HubicConnection::readData(QNetworkReply *reply)
 {
     if (reply->error() == QNetworkReply::NoError) {
-        qDebug() << reply->readAll();
+        if (reply->url().toString() == (base_url + "/account")) {
+            QJsonObject jobj;
+
+            jobj = QJsonDocument::fromJson(reply->readAll()).object();
+            email = jobj.value("email").toString();
+            firstName = jobj.value("firstname").toString();
+            lastName = jobj.value("lastname").toString();
+            activated = jobj.value("activated").toString();
+            creationDate = jobj.value("creationDate").toString();
+            language = jobj.value("language").toString();
+            status = jobj.value("status").toString();
+            offer = jobj.value("offer").toString();
+
+            qDebug() << "Firstname: " << firstName;
+            qDebug() << "Lastname: " << lastName;
+            qDebug() << "Email: " << email;
+            qDebug() << "Activated: " << activated;
+            qDebug() << "Creation Date: " << creationDate;
+            qDebug() << "Language: " << language;
+            qDebug() << "Status: " << status;
+            qDebug() << "Offer: " << offer;
+        }
+        else if (reply->url().toString() == (base_url + "/account/credentials")) {
+            QJsonObject jobj;
+
+            jobj = QJsonDocument::fromJson(reply->readAll()).object();
+            osEndpoint = jobj.value("endpoint").toString();
+            osToken = jobj.value("token").toString();
+            osTokenExpiresOn = jobj.value("expires").toString();
+
+            qDebug() << "Endpoint: " << osEndpoint;
+            qDebug() << "Token: " << osToken;
+            qDebug() << "Expires: " << osTokenExpiresOn;
+
+            qDebug() << "Let's test connection to OpenStack api...";
+            queue->push("get", xnrprep(osEndpoint, osToken));
+        }
+        else if (reply->url().toString() == (base_url + "/account/usage")) {
+            QJsonObject jobj;
+
+            jobj = QJsonDocument::fromJson(reply->readAll()).object();
+            availableSpace = jobj.value("quota").toVariant().toULongLong();
+            usedSpace = jobj.value("used").toVariant().toULongLong();
+
+            qDebug() << "Quota: " << availableSpace;
+            qDebug() << "Used: " << usedSpace;
+        }
+        else {
+            qDebug() << reply->readAll();
+        }
     }
     else {
         qDebug() << "Error! Errno: " << reply->error();
         qDebug() << reply->errorString();
     }
+
+    reply->deleteLater();
 }
 
 QNetworkRequest HubicConnection::nrprep(QUrl url, QString token)
@@ -101,5 +155,13 @@ QNetworkRequest HubicConnection::nrprep(QUrl url, QString token)
     QNetworkRequest request(url);
     request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
     request.setRawHeader(QByteArray("Authorization"), QByteArray("Bearer ") + token.toUtf8());
+    return request;
+}
+
+QNetworkRequest HubicConnection::xnrprep(QUrl url, QString token)
+{
+    QNetworkRequest request(url);
+    request.setRawHeader(QByteArray("Accept"), QByteArray("application/json"));
+    request.setRawHeader(QByteArray("X-Auth-Token"), token.toUtf8());
     return request;
 }
