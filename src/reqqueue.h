@@ -13,7 +13,7 @@ class ReqQueue: QObject{
     
     public:
         ReqQueue(QNetworkAccessManager*);
-        void push(QString, QNetworkRequest);
+        void push(QString, QNetworkRequest, QObject*, const char*);
     
     public slots:
         ReqQueueItem pop(void);

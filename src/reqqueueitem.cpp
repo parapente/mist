@@ -5,6 +5,8 @@ ReqQueueItem::ReqQueueItem()
     _bytearray = NULL;
     _multipart = NULL;
     _reply = NULL;
+    _receiver = NULL;
+    _slot = NULL;
 }
 
 ReqQueueItem::ReqQueueItem(int id, QString command, QNetworkRequest request) : _id(id), _command(command), _request(request)
@@ -12,12 +14,16 @@ ReqQueueItem::ReqQueueItem(int id, QString command, QNetworkRequest request) : _
     _bytearray = NULL;
     _multipart = NULL;
     _reply = NULL;
+    _receiver = NULL;
+    _slot = NULL;
 }
 
 ReqQueueItem::ReqQueueItem(int id, QString command, QNetworkReply* reply) : _id(id), _command(command), _reply(reply)
 {
     _bytearray = NULL;
     _multipart = NULL;
+    _receiver = NULL;
+    _slot = NULL;
 }
 
 ReqQueueItem::ReqQueueItem(const ReqQueueItem &other)
@@ -28,6 +34,8 @@ ReqQueueItem::ReqQueueItem(const ReqQueueItem &other)
     _bytearray = other.byteArray();
     _multipart = other.multipart();
     _reply = other.reply();
+    _receiver = other.receiver();
+    _slot = other.receiverSlot();
 }
 
 ReqQueueItem& ReqQueueItem::operator =(const ReqQueueItem& other)
@@ -38,6 +46,8 @@ ReqQueueItem& ReqQueueItem::operator =(const ReqQueueItem& other)
     _bytearray = other.byteArray();
     _multipart = other.multipart();
     _reply = other.reply();
+    _receiver = other.receiver();
+    _slot = other.receiverSlot();
 }
 
 ReqQueueItem::~ReqQueueItem()
@@ -106,4 +116,24 @@ QNetworkReply* ReqQueueItem::reply() const
 void ReqQueueItem::setReply(QNetworkReply* reply)
 {
     _reply = reply;
+}
+
+void ReqQueueItem::setReceiver(QObject *obj)
+{
+    _receiver = obj;
+}
+
+void ReqQueueItem::setReceiverSlot(const char *slot)
+{
+    _slot = slot;
+}
+
+QObject* ReqQueueItem::receiver() const
+{
+    return _receiver;
+}
+
+const char* ReqQueueItem::receiverSlot() const
+{
+    return _slot;
 }

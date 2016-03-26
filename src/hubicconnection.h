@@ -28,6 +28,11 @@ class HubicConnection : public O2Hubic {
         void onLinkingFailed(void);
         void onLinkedChanged(void);
         void onLinkingSucceeded(void);
+
+        void accountUsage(void);
+        void accountCredentials(void);
+        void account(void);
+        void getContainers(void);
         
     private:
         QString base_url;
@@ -38,7 +43,7 @@ class HubicConnection : public O2Hubic {
         QHash<int, int> reqhash;
 
         mistWebDialog *webDialog;
-        QNetworkReply *reply;
+        //QNetworkReply *reply;
         QNetworkAccessManager *manager;
         O2Requestor *requestor;
         ReqQueue *queue;

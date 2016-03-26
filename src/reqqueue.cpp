@@ -8,12 +8,14 @@ ReqQueue::ReqQueue(QNetworkAccessManager *nam)
     connect(_nam, SIGNAL(finished(QNetworkReply*)), this, SLOT(onFinishedRequest(QNetworkReply*)));
 }
 
-void ReqQueue::push(QString command, QNetworkRequest newreq)
+void ReqQueue::push(QString command, QNetworkRequest newreq, QObject *obj, const char *slot)
 {
     ReqQueueItem item;
     item.setCommand(command);
     item.setRequest(newreq);
     item.setId(_id++);
+    item.setReceiver(obj);
+    item.setReceiverSlot(slot);
     _reqlist.append(item);
 
     if (_numconnections)
@@ -25,13 +27,13 @@ ReqQueueItem ReqQueue::pop()
     return _reqlist.takeFirst();
 }
 
-void ReqQueue::onFinishedRequest(QNetworkReply *req)
+void ReqQueue::onFinishedRequest(QNetworkReply *reply)
 {
     // Remove this request from the list
     QMutableListIterator<ReqQueueItem> i(_reqlist);
     while (i.hasNext()) {
         i.next();
-        if (i.value().request().url() == req->request().url()) {
+        if (i.value().request().url() == reply->request().url()) {
             i.remove();
             //qDebug() << "Removed item " << i;
             qDebug() << "Equal!";
@@ -39,7 +41,7 @@ void ReqQueue::onFinishedRequest(QNetworkReply *req)
         else {
             qDebug() << "Not equal!";
             qDebug() << i.value().request().url();
-            qDebug() << req->request().url();
+            qDebug() << reply->request().url();
         }
     }
     _numconnections++;
@@ -55,6 +57,7 @@ void ReqQueue::startNextReq(void)
     ReqQueueItem nextItem = _reqlist.first();
     if (nextItem.command() == "get") {
         nextItem.setReply(_nam->get(nextItem.request()));
+        connect(nextItem.reply(), SIGNAL(finished()), nextItem.receiver(), nextItem.receiverSlot());
     }
     else if (nextItem.command() == "post") {
         if (nextItem.multipart()) {
